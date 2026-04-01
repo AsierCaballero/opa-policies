@@ -1,0 +1,8 @@
+opa-policies
+*.test
+*.out
+*.prof
+dist/
+.idea/
+.vscode/
+*.swp
