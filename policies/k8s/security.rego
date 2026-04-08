@@ -45,3 +45,9 @@ deny_no_readonly_rootfs[msg] {
     not container.securityContext.readOnlyRootFilesystem
     msg = sprintf("container %v: readOnlyRootFilesystem not set", [container.name])
 }
+
+deny_no_security_context[msg] {
+    container := input.spec.containers[_]
+    not container.securityContext
+    msg = sprintf("container %v: no securityContext at all", [container.name])
+}
