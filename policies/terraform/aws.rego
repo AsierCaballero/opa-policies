@@ -61,3 +61,15 @@ deny_unencrypted_rds[msg] {
     not resource.storage_encrypted
     msg = sprintf("RDS instance %v: storage not encrypted", [resource.identifier])
 }
+
+deny_no_versioning[msg] {
+    resource := input.resource.aws_s3_bucket[_]
+    not resource.versioning[0].enabled
+    msg = sprintf("S3 bucket %v: versioning not enabled", [resource.bucket])
+}
+
+deny_no_server_side_encryption[msg] {
+    resource := input.resource.aws_s3_bucket[_]
+    not resource.server_side_encryption_configuration
+    msg = sprintf("S3 bucket %v: server-side encryption not configured", [resource.bucket])
+}
