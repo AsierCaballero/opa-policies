@@ -33,3 +33,10 @@ deny_vm_public_ip[msg] {
     resource.public_ip_address_id != null
     msg = sprintf("NIC %v: has public IP attached", [resource.name])
 }
+
+deny_any_to_any[msg] {
+    resource := input.resource.azurerm_network_security_rule[_]
+    resource.source_address_prefixes[_] == "*"
+    resource.destination_address_prefixes[_] == "*"
+    msg = sprintf("NSG rule %v: allows any-to-any traffic", [resource.name])
+}
