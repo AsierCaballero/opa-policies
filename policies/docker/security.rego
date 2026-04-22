@@ -59,3 +59,16 @@ deny_multistage_copy_as_root[msg] {
     not contains(lines, "USER ")
     msg = "multistage COPY without USER: files owned by root"
 }
+
+deny_no_init[msg] {
+    lines := input.content
+    not contains(lines, "init")
+    contains(lines, "CMD ")
+    msg = "no init process specified (consider tini or dumb-init)"
+}
+
+deny_stale_base_image[msg] {
+    lines := input.content
+    contains(lines, "ubuntu:18.04")
+    msg = "ubuntu:18.04 is EOL since 2023"
+}
