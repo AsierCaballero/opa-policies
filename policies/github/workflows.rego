@@ -55,3 +55,9 @@ deny_self_hosted_no_isolation[msg] {
     not job.environment
     msg = sprintf("job %v runs on self-hosted runner without environment isolation", [job.name])
 }
+
+deno_reusable_call_invalid[msg] {
+    input.jobs[_].uses != null
+    not contains(input.jobs[_].uses, "@")
+    msg = sprintf("reusable workflow call %v not pinned", [input.jobs[_].uses])
+}
