@@ -193,3 +193,4 @@ func walkData(data map[string]interface{}, policy, prefix string) []Result {
 func isDenyPrefix(k string) bool {
 	return k == "deny" || strings.HasPrefix(k, "deny_")
 }
+// TODO: cache compiled queries per policy for repeated calls
