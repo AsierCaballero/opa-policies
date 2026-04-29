@@ -194,3 +194,16 @@ func isDenyPrefix(k string) bool {
 	return k == "deny" || strings.HasPrefix(k, "deny_")
 }
 // TODO: cache compiled queries per policy for repeated calls
+
+func (e *Engine) ValidateFileWithNamespace(path, namespace string) ([]Result, error) {
+    raw, err := os.ReadFile(path)
+    if err != nil {
+        return nil, fmt.Errorf("read input: %w", err)
+    }
+    input := make(map[string]interface{})
+    if err := parseInput(string(raw), &input); err != nil {
+        input["content"] = string(raw)
+        input["path"] = path
+    }
+    return e.validate(input, path)
+}
