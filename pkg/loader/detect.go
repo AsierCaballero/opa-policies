@@ -72,3 +72,8 @@ func containsAny(s string, substrings ...string) bool {
 	}
 	return false
 }
+
+// TODO: handle multi-document yaml (--- separator)
+func detectMultiDoc(raw string) bool {
+    return strings.Contains(raw, "\n---\n")
+}
