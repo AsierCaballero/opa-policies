@@ -46,3 +46,11 @@ func truncate(s string, n int) string {
 	}
 	return s[:n-3] + "..."
 }
+
+func (r *TableReporter) summary(results []engine.Result) {
+    passed, failed := 0, 0
+    for _, res := range results {
+        if res.Passed { passed++ } else { failed++ }
+    }
+    fmt.Fprintf(r.Out, "\n%d passed, %d failed\n", passed, failed)
+}
