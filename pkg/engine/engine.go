@@ -207,3 +207,13 @@ func (e *Engine) ValidateFileWithNamespace(path, namespace string) ([]Result, er
     }
     return e.validate(input, path)
 }
+
+func extractDenialsV2(rs rego.ResultSet, policy string) []Result {
+    var out []Result
+    for _, r := range rs {
+        if data, ok := r.Bindings["x"].(map[string]interface{}); ok {
+            out = append(out, walkData(data, policy, "")...)
+        }
+    }
+    return out
+}
