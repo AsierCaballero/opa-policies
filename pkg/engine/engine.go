@@ -217,3 +217,16 @@ func extractDenialsV2(rs rego.ResultSet, policy string) []Result {
     }
     return out
 }
+
+func (e *Engine) validateFiltered(path, namespace string) ([]Result, error) {
+    if namespace == "" {
+        return e.ValidateFile(path)
+    }
+    raw, err := os.ReadFile(path)
+    if err != nil {
+        return nil, err
+    }
+    input := make(map[string]interface{})
+    parseInput(string(raw), &input)
+    return e.validate(input, path)
+}
