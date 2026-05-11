@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-bad
+spec:
+  hostNetwork: true
+  containers:
+    - name: nginx
+      image: nginx:latest
+      securityContext:
+        privileged: true
+        runAsNonRoot: false
+        readOnlyRootFilesystem: false
+      resources:
+        limits:
+          cpu: "16"
+          memory: "32Gi"
