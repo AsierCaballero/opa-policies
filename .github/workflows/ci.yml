@@ -14,3 +14,8 @@ jobs:
           python-version: "3.12"
       - run: pip install opa
       - run: opa test ./policies/...
+      - run: go build -o opa-policies .
+      - run: ./opa-policies validate examples/k8s/bad-pod.yaml
+      - run: ./opa-policies validate examples/docker/bad.Dockerfile
+      - run: ./opa-policies validate examples/terraform/bad-aws.tf
+      - run: ./opa-policies validate examples/github/bad-workflow.yaml
