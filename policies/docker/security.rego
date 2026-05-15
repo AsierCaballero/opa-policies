@@ -13,62 +13,48 @@ deny_root_user[msg] {
 deny_root_user[msg] {
     lines := input.content
     not contains(lines, "USER ")
-    msg = "no USER directive found (defaults to root)"
+    msg = "no USER directive (defaults to root)"
 }
 
-deny_add[msg] {
+deny_add_instead_of_copy[msg] {
     lines := input.content
     contains(lines, "ADD ")
-    # ADD unpacks archives automatically; prefer COPY
-    msg = "use COPY instead of ADD unless archive auto-extraction is intentional"
+    msg = "ADD unpacks archives; prefer COPY"
 }
 
 deny_no_tag[msg] {
-    lines := input.content
-    match := regex.find_n("FROM\\s+([^\\s]+)", lines, -1)
-    some m
-    image := match[m]
+    image := input.base_image
     not contains(image, ":")
-    msg = sprintf("base image %v has no tag (uses :latest)", [image])
+    msg = sprintf("base image %v has no tag (defaults to :latest)", [image])
 }
 
 deny_latest_tag[msg] {
-    lines := input.content
-    match := regex.find_n("FROM\\s+([^\\s]+)", lines, -1)
-    some m
-    image := match[m]
+    image := input.base_image
     contains(image, ":latest")
-    msg = sprintf("base image %v uses :latest tag", [image])
+    msg = sprintf("base image %v uses :latest", [image])
 }
 
 deny_no_healthcheck[msg] {
     lines := input.content
-    not contains(lines, "HEALTHCHECK ")
-    msg = "no HEALTHCHECK instruction found"
+    not contains(lines, "HEALTHCHECK")
+    msg = "no HEALTHCHECK instruction"
 }
 
 deny_exposed_port_80[msg] {
     lines := input.content
     contains(lines, "EXPOSE 80")
-    msg = "EXPOSE 80: consider using higher port (>1024)"
-}
-
-deny_multistage_copy_as_root[msg] {
-    lines := input.content
-    contains(lines, "COPY --from=")
-    not contains(lines, "USER ")
-    msg = "multistage COPY without USER: files owned by root"
+    msg = "EXPOSE 80: consider a higher port (>1024)"
 }
 
 deny_no_init[msg] {
     lines := input.content
     not contains(lines, "init")
     contains(lines, "CMD ")
-    msg = "no init process specified (consider tini or dumb-init)"
+    msg = "no init process (consider tini/dumb-init)"
 }
 
 deny_stale_base_image[msg] {
     lines := input.content
     contains(lines, "ubuntu:18.04")
-    msg = "ubuntu:18.04 is EOL since 2023"
+    msg = "ubuntu:18.04 is EOL since April 2023"
 }
