@@ -230,3 +230,15 @@ func (e *Engine) validateFiltered(path, namespace string) ([]Result, error) {
     parseInput(string(raw), &input)
     return e.validate(input, path)
 }
+
+func filterBySeverity(results []engine.Result, threshold string) []engine.Result {
+    levels := map[string]int{"low": 0, "medium": 1, "high": 2, "critical": 3}
+    min := levels[threshold]
+    var out []engine.Result
+    for _, r := range results {
+        if levels[r.Severity] >= min {
+            out = append(out, r)
+        }
+    }
+    return out
+}
