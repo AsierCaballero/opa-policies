@@ -3,7 +3,6 @@ package reporter
 import (
 	"fmt"
 	"io"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/AsierCaballero/opa-policies/pkg/engine"

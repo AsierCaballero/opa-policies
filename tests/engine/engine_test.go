@@ -4,7 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"github.com/open-policy-agent/opa/ast"
+
+	"github.com/AsierCaballero/opa-policies/pkg/engine"
 )
 
 func TestNewEngine(t *testing.T) {
@@ -17,7 +18,7 @@ deny["test violation"] { true }`
 		t.Fatal(err)
 	}
 
-	e, err := New(dir)
+	e, err := engine.New(dir)
 	if err != nil {
 		t.Fatalf("New() err = %v", err)
 	}
@@ -45,7 +46,7 @@ deny["always fails"] { true }`
 		t.Fatal(err)
 	}
 
-	e, err := New(dir)
+	e, err := engine.New(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,8 +72,12 @@ deny["always fails"] { true }`
 }
 
 func TestValidateFileNotFound(t *testing.T) {
-	e := &Engine{modules: make(map[string]*ast.Module)}
-	_, err := e.ValidateFile("/nonexistent/file.yaml")
+	dir := t.TempDir()
+	e, err := engine.New(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = e.ValidateFile("/nonexistent/file.yaml")
 	if err == nil {
 		t.Error("expected error for nonexistent file")
 	}

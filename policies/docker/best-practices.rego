@@ -37,8 +37,8 @@ deny_apt_no_recommends[msg] {
 # multiple FROM statements for multistage but no COPY --from=
 deny_multistage_missing_copy[msg] {
     lines := input.content
-    count := count([x | startswith(x, "FROM "); x := trim(regex.find_n("FROM\\s+", lines, -1)[_], " ")])
-    count > 1
+    froms := [line | line := split(lines, "\n")[_]; startswith(line, "FROM ")]
+    count(froms) > 1
     not contains(lines, "COPY --from=")
     msg = "multiple FROM stages but no COPY --from= detected"
 }

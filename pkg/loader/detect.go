@@ -18,15 +18,17 @@ const (
 )
 
 func DetectFileType(path string) (FileType, error) {
-	ext := filepath.Ext(path)
+	ext := strings.ToLower(filepath.Ext(path))
 	switch ext {
 	case ".yaml", ".yml":
 		return detectYAMLType(path)
 	case ".tf", ".tfvars":
 		return TypeTerraform, nil
-	case ".dockerfile", "":
-		base := filepath.Base(path)
-		if base == "Dockerfile" || base == "Containerfile" {
+	case ".dockerfile":
+		return TypeDocker, nil
+	case "":
+		base := strings.ToLower(filepath.Base(path))
+		if base == "dockerfile" || base == "containerfile" {
 			return TypeDocker, nil
 		}
 		return TypeUnknown, fmt.Errorf("unknown file: %s", path)

@@ -15,8 +15,8 @@ test_nonroot_fails_when_not_set {
 }
 
 test_host_network_detected {
-    input := {"spec": {"hostNetwork": true, "containers": [{"name": "nginx"}], "metadata": {"name": "test"}}}
-    deny_host_network[_] with input as input
+    inp := {"spec": {"hostNetwork": true, "containers": [{"name": "nginx"}], "metadata": {"name": "test"}}}
+    data.k8s.security.deny_host_network with input as inp
 }
 
 test_readonly_rootfs_notice {

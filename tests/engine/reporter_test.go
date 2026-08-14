@@ -5,13 +5,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/AsierCaballero/opa-policies/pkg/engine"
 	"github.com/AsierCaballero/opa-policies/pkg/reporter"
 )
 
 func TestTableReporter(t *testing.T) {
 	var buf bytes.Buffer
 	r := &reporter.TableReporter{Out: &buf}
-	results := []Result{
+	results := []engine.Result{
 		{Policy: "k8s/security", File: "pod.yaml", Message: "test", Severity: "high", Passed: false},
 		{Policy: "tf/aws", File: "main.tf", Message: "ok", Severity: "info", Passed: true},
 	}
@@ -29,7 +30,7 @@ func TestTableReporter(t *testing.T) {
 func TestJUnitReporter(t *testing.T) {
 	var buf bytes.Buffer
 	r := &reporter.JUnitReporter{Out: &buf}
-	results := []Result{
+	results := []engine.Result{
 		{Policy: "test", File: "x.yaml", Message: "fail", Passed: false},
 	}
 	if err := r.Report(results); err != nil {

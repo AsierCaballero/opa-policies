@@ -9,11 +9,10 @@ jobs:
         with:
           go-version: "1.22"
       - run: go test ./...
-      - uses: actions/setup-python@v5
+      - uses: open-policy-agent/setup-opa@v2
         with:
-          python-version: "3.12"
-      - run: pip install opa
-      - run: opa test ./policies/...
+          version: 0.68.0
+      - run: opa test ./policies ./tests/policies
       - run: go build -o opa-policies .
       - run: ./opa-policies validate examples/k8s/bad-pod.yaml
       - run: ./opa-policies validate examples/docker/bad.Dockerfile

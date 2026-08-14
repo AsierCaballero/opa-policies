@@ -2,7 +2,6 @@ package reporter
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"time"
 

@@ -18,7 +18,7 @@ deny_untrusted_checkout[msg] {
     job := input.jobs[_]
     step := job.steps[_]
     step.uses == "actions/checkout@v4"
-    step.with["repository"] != "${{ github.repository }}"
+    step["with"]["repository"] != "${{ github.repository }}"
     msg = "workflow checks out a different repository; verify trust model"
 }
 
@@ -56,8 +56,9 @@ deny_self_hosted_no_isolation[msg] {
     msg = sprintf("job %v runs on self-hosted runner without environment isolation", [job.name])
 }
 
-deno_reusable_call_invalid[msg] {
-    input.jobs[_].uses != null
-    not contains(input.jobs[_].uses, "@")
-    msg = sprintf("reusable workflow call %v not pinned", [input.jobs[_].uses])
+deny_reusable_call_invalid[msg] {
+    call := input.jobs[_].uses
+    call != null
+    not contains(call, "@")
+    msg = sprintf("reusable workflow call %v not pinned", [call])
 }

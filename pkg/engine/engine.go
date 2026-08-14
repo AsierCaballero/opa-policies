@@ -7,8 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/ast"
+	"github.com/open-policy-agent/opa/rego"
+
+	"github.com/AsierCaballero/opa-policies/pkg/loader"
 )
 
 type Result struct {
@@ -90,13 +92,36 @@ func (e *Engine) ValidateFile(path string) ([]Result, error) {
 		input["path"] = path
 	}
 
-	return e.validate(input, path)
+	ns := namespaceForFile(path)
+	return e.validate(input, ns, path)
 }
 
-func (e *Engine) validate(input map[string]interface{}, source string) ([]Result, error) {
+func namespaceForFile(path string) string {
+	ft, err := loader.DetectFileType(path)
+	if err != nil {
+		return ""
+	}
+	switch ft {
+	case loader.TypeK8s:
+		return "k8s"
+	case loader.TypeTerraform:
+		return "terraform"
+	case loader.TypeDocker:
+		return "docker"
+	case loader.TypeGitHub:
+		return "github"
+	default:
+		return ""
+	}
+}
+
+func (e *Engine) validate(input map[string]interface{}, namespace, source string) ([]Result, error) {
 	var results []Result
 
 	for _, p := range e.policies {
+		if namespace != "" && p.Namespace != namespace {
+			continue
+		}
 		r := rego.New(
 			rego.Query("x = data"),
 			rego.Module(p.Path, p.Module.String()),
@@ -174,6 +199,13 @@ func walkData(data map[string]interface{}, policy, prefix string) []Result {
 			for _, item := range val {
 				if m, ok := item.(map[string]interface{}); ok {
 					out = append(out, walkData(m, policy, full)...)
+				} else if msg, ok := item.(string); ok && isDenyPrefix(k) {
+					out = append(out, Result{
+						Policy:   policy,
+						Message:  msg,
+						Severity: "high",
+						Passed:   false,
+					})
 				}
 			}
 		case string:
@@ -193,52 +225,53 @@ func walkData(data map[string]interface{}, policy, prefix string) []Result {
 func isDenyPrefix(k string) bool {
 	return k == "deny" || strings.HasPrefix(k, "deny_")
 }
+
 // TODO: cache compiled queries per policy for repeated calls
 
 func (e *Engine) ValidateFileWithNamespace(path, namespace string) ([]Result, error) {
-    raw, err := os.ReadFile(path)
-    if err != nil {
-        return nil, fmt.Errorf("read input: %w", err)
-    }
-    input := make(map[string]interface{})
-    if err := parseInput(string(raw), &input); err != nil {
-        input["content"] = string(raw)
-        input["path"] = path
-    }
-    return e.validate(input, path)
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("read input: %w", err)
+	}
+	input := make(map[string]interface{})
+	if err := parseInput(string(raw), &input); err != nil {
+		input["content"] = string(raw)
+		input["path"] = path
+	}
+	return e.validate(input, namespace, path)
 }
 
 func extractDenialsV2(rs rego.ResultSet, policy string) []Result {
-    var out []Result
-    for _, r := range rs {
-        if data, ok := r.Bindings["x"].(map[string]interface{}); ok {
-            out = append(out, walkData(data, policy, "")...)
-        }
-    }
-    return out
+	var out []Result
+	for _, r := range rs {
+		if data, ok := r.Bindings["x"].(map[string]interface{}); ok {
+			out = append(out, walkData(data, policy, "")...)
+		}
+	}
+	return out
 }
 
 func (e *Engine) validateFiltered(path, namespace string) ([]Result, error) {
-    if namespace == "" {
-        return e.ValidateFile(path)
-    }
-    raw, err := os.ReadFile(path)
-    if err != nil {
-        return nil, err
-    }
-    input := make(map[string]interface{})
-    parseInput(string(raw), &input)
-    return e.validate(input, path)
+	if namespace == "" {
+		return e.ValidateFile(path)
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	input := make(map[string]interface{})
+	parseInput(string(raw), &input)
+	return e.validate(input, namespace, path)
 }
 
-func filterBySeverity(results []engine.Result, threshold string) []engine.Result {
-    levels := map[string]int{"low": 0, "medium": 1, "high": 2, "critical": 3}
-    min := levels[threshold]
-    var out []engine.Result
-    for _, r := range results {
-        if levels[r.Severity] >= min {
-            out = append(out, r)
-        }
-    }
-    return out
+func filterBySeverity(results []Result, threshold string) []Result {
+	levels := map[string]int{"low": 0, "medium": 1, "high": 2, "critical": 3}
+	min := levels[threshold]
+	var out []Result
+	for _, r := range results {
+		if levels[r.Severity] >= min {
+			out = append(out, r)
+		}
+	}
+	return out
 }

@@ -8,9 +8,8 @@ deny_hardcoded_secret[msg] {
     job := input.jobs[_]
     step := job.steps[_]
     env := object.get(step, "env", {})
-    key := keys(env)[_]
+    key := object.keys(env)[_]
     val := env[key]
-    # naive check for common secret patterns
     contains(lower(key), "token")
     not contains(val, "${{ secrets.")
     msg = sprintf("step %v: env var %v may contain a hardcoded token", [step.name, key])
@@ -20,7 +19,7 @@ deny_hardcoded_secret[msg] {
     job := input.jobs[_]
     step := job.steps[_]
     env := object.get(step, "env", {})
-    key := keys(env)[_]
+    key := object.keys(env)[_]
     val := env[key]
     contains(lower(key), "password")
     not contains(val, "${{ secrets.")
@@ -31,7 +30,7 @@ deny_hardcoded_secret[msg] {
     job := input.jobs[_]
     step := job.steps[_]
     env := object.get(step, "env", {})
-    key := keys(env)[_]
+    key := object.keys(env)[_]
     val := env[key]
     contains(lower(key), "secret")
     not contains(val, "${{ secrets.")
