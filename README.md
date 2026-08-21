@@ -1,6 +1,18 @@
 # opa-policies
 
+[![CI](https://img.shields.io/github/actions/workflow/status/AsierCaballero/opa-policies/ci.yml?label=CI&logo=github)](https://github.com/AsierCaballero/opa-policies/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 Policy-as-code library and CLI validator for Kubernetes, Terraform, Docker, and GitHub Actions. Built on [Open Policy Agent](https://www.openpolicyagent.org/).
+
+## Who this is for
+
+Platform and security teams that need **guardrails in CI** before merge: privileged pods, open
+security groups, unpinned Actions, root containers. Useful in regulated contexts (finance, pharma, public sector) where I typically engage.
+
+**Limitations:** starting policy pack (~50 rules) — extend per org; not a substitute for runtime admission alone.
+
+**Engagements:** [Calendly](https://calendly.com/asier-caballero) · [Profile](https://github.com/AsierCaballero)
 
 ## Overview
 
