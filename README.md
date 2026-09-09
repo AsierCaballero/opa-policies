@@ -14,6 +14,29 @@ security groups, unpinned Actions, root containers. Useful in regulated contexts
 
 **Engagements:** [Calendly](https://calendly.com/asier-caballero) · [Profile](https://github.com/AsierCaballero)
 
+## 30-second demo
+
+```bash
+make build
+./opa-policies validate examples/k8s/bad-pod.yaml
+```
+
+Expected (excerpt):
+
+```text
+Policy                  File                        Severity   Status   Message
+------                  ----                        --------   ------   -------
+k8s/security.rego       examples/k8s/bad-pod.yaml   high       FAIL     container nginx is privileged
+k8s/security.rego       examples/k8s/bad-pod.yaml   high       FAIL     container nginx allows running as root
+k8s/security.rego       examples/k8s/bad-pod.yaml   high       FAIL     pod nginx-bad uses host network
+```
+
+SARIF for CI:
+
+```bash
+./opa-policies validate examples/k8s/bad-pod.yaml -f sarif
+```
+
 ## Overview
 
 opa-policies bundles ~50 Rego policies across four infrastructure domains and provides a CLI to validate your manifests without leaving the terminal.
