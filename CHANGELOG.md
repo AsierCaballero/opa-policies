@@ -1,6 +1,15 @@
+# Changelog
 
-# opa-policies v0.1.0
+## v1.0.0
 
-Initial release with policy libraries for Kubernetes (20), Terraform (15), Docker (8), GitHub Actions (10).
+First stable portfolio release.
+
+- Policy pack for Kubernetes, Terraform, Docker, and GitHub Actions
+- CLI with table / SARIF / JUnit reporters
+- Documented 30-second demo against `examples/k8s/bad-pod.yaml`
+- CI on every push
+
+## v0.1.0
+
+Initial release with policy libraries for Kubernetes, Terraform, Docker, GitHub Actions.
 CLI with table/SARIF/JUnit output.
-
